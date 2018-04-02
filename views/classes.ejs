@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+	<% include ./partials/head %>
+</head>
+
+<body class="container">
+
+	<header>
+		<% include ./partials/header %>
+	</header>
+	<main>
+		<div class="container-fluid text-left">
+			<div class="row content">
+				<div class="col-sm-2 sidenav">
+					<p>
+						<a href="/addClass">Dive Classes</a>
+					</p>
+					<p>
+						<a href="#">Top Diving Sites</a>
+					</p>
+				</div>
+
+				<div class="col-sm-8 text-left">
+
+					<div class="col-md-6 col-md-offset-3">
+						<form id="classForm">
+							<div class="form-group">
+								<label for="classname">Class Name:</label>
+								<input type="text" class="form-control" id="classname">
+								<br />
+								<label for="classdesc">Description:</label>
+								<textarea class="form-control" rows="10" id="classdesc"></textarea>
+								<br />
+								<label for="classprice">Price:</label>
+								<input type="number" class="form-control" id="classprice">
+								<br />
+								<button type="submit" class="btn btn-success submit">Submit</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<div class="col-sm-2 sidenav">
+					<div class="well">
+						<p>ADS</p>
+					</div>
+					<div class="well">
+						<p>ADS</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Custom Script -->
+		<!-- <script src='../scripts/classes.js' type="text/javascript"></script> -->
+		<script>
+			$(document).ready(function () {
+				// Gets an optional query string from our url (i.e. ?post_id=23)
+				var url = window.location.search;
+				var postId;
+				// Sets a flag for whether or not we're updating a post to be false initially
+				var updating = false;
+
+				// If we have this section in our url, we pull out the post id from the url
+				// In localhost:8080/cms?post_id=1, postId is 1
+				if (url.indexOf("?post_id=") !== -1) {
+					postId = url.split("=")[1];
+					getClassData(postId);
+				}
+
+
+				// Getting jQuery references to the post body, title, form, and category select
+				var titleInput = $("#classname");
+				var classInput = $("#classdesc");
+				var priceInput = $("#classprice");
+				var classForm = $("#classForm");
+
+				// Adding an event listener for when the form is submitted
+				$(classForm).on("submit", function handleFormSubmit(event) {
+					event.preventDefault();
+
+					console.log(titleInput);
+					console.log(classInput);
+					console.log(priceInput);
+
+
+					// Wont submit the post if we are missing a body or a title
+					if (!titleInput.val().trim() || !classInput.val().trim()) {
+						return;
+					}
+					// Constructing a newPost object to hand to the database
+					var newClass = {
+						className: titleInput.val().trim(),
+						classDescription: classInput.val().trim(),
+						classPrice: priceInput.val()
+					};
+
+					console.log(newClass);
+
+					// If we're updating a post run updatePost to update a post
+					// Otherwise run submitPost to create a whole new post
+					if (updating) {
+						newClass.id = postId;
+						updateClass(newClass);
+					} else {
+						submitClass(newClass);
+					}
+				});
+
+				// Submits a new post and brings user to blog page upon completion
+				function submitClass(Class) {
+					$.post("/api/classes/", Class, function () {
+						window.location.href = "/admin";
+					});
+				}
+
+				// Gets post data for a post if we're editing
+				function getClassData(id) {
+					$.get("/api/classes/" + id, function (data) {
+						if (data) {
+							// If this post exists, prefill our cms forms with its data 
+							titleInput.val(data.className);
+							classInput.val(data.classDescription);
+							priceInput.val(data.classPrice);
+							// If we have a post with this id, set a flag for us to know to update the post
+							// when we hit submit
+							updating = true;
+						}
+					});
+				}
+
+				// Update a given post, bring user to the blog page when done
+				function updateClass(Class) {
+					$.ajax({
+							method: "PUT",
+							url: "/api/classes",
+							data: Class
+						})
+						.then(function () {
+							window.location.href = "/admin";
+						});
+				}
+			});
+		</script>
+
+	</main>
+
+	<footer>
+		<% include ./partials/footer %>
+	</footer>
+
+</body>
+
+</html>
