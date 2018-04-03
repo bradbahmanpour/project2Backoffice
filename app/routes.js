@@ -49,10 +49,12 @@ module.exports = function(app, passport) {
 
     // POST route for saving a new Class
     app.post("/api/classes", function (req, res) {
-        console.log(req.body);
+        console.log("I am in Routes.js file under Post:" + req.body);
         db.classes.create({
             className: req.body.className,
             classDescription: req.body.classDescription,
+            classSchedule: req.body.classSchedule,
+            classPrerequisit: req.body.classPrerequisit,
             classPrice: req.body.classPrice
             })
             .then(function (dbPost) {
@@ -85,7 +87,88 @@ module.exports = function(app, passport) {
     });
 
 
-	 
+	// =====================================
+	// TopSpots =============================
+	// =====================================
+	// GET route for getting all of the topSpots Information
+
+	// we will want this protected so you have to be logged in to visit
+	// we will use route middleware to verify this (the isLoggedIn function)
+	app.get('/addTopSpot', isLoggedIn, function(req, res) {
+		res.render('addTopSpot.ejs', {
+			user : req.user // get the user out of session and pass to template
+		});
+	});
+
+	// we will want this protected so you have to be logged in to visit
+	// we will use route middleware to verify this (the isLoggedIn function)
+	app.get('/topSpots', isLoggedIn, function(req, res) {
+		res.render('topSpots.ejs', {
+			user : req.user // get the user out of session and pass to template
+		});
+	});
+	
+	
+	app.get("/api/topSpots/", isLoggedIn,function (req, res) {
+
+        db.topSpots.findAll({})
+            .then(function (dbPost) {
+                res.json(dbPost);
+            });
+    });
+
+
+    // Get route for retrieving a single topSpot
+    app.get("/api/topSpots/:id", isLoggedIn,function (req, res) {
+        db.topSpots.findOne({
+                where: {
+                    id: req.params.id
+                }
+            })
+            .then(function (dbPost) {
+                res.json(dbPost);
+            });
+    });
+
+    // POST route for saving a new topSpot
+    app.post("/api/topSpots", function (req, res) {
+        console.log(req.body);
+        db.topSpots.create({
+            spot: req.body.spot,
+            images: req.body.images,
+			body: req.body.body,
+			zip: req.body.zip
+            })
+            .then(function (dbPost) {
+                res.json(dbPost);
+            });
+    });
+
+    // DELETE route for deleting a topSpot
+    app.delete("/api/topSpots/:id", function (req, res) {
+        db.topSpots.destroy({
+                where: {
+                    id: req.params.id
+                }
+            })
+            .then(function (dbPost) {
+                res.json(dbPost);
+            });
+    });
+
+    // PUT route for updating a topSpot
+    app.put("/api/topSpots", function (req, res) {
+        db.topSpots.update(req.body, {
+                where: {
+                    id: req.body.id
+                }
+            })
+            .then(function (dbPost) {
+                res.json(dbPost);
+            });
+    });
+	  
+
 	app.get('/', function(req, res) {
 		res.render('index.ejs'); // load the index.ejs file
 	});
@@ -98,6 +181,11 @@ module.exports = function(app, passport) {
 
 		// render the page and pass in any flash data if it exists
 		res.render('login.ejs', { message: req.flash('loginMessage') });
+    });
+    
+    // show the login form
+	app.get('/unAuthorized', function(req, res) {
+        res.render('unAuthorized.ejs'); // load the index.ejs file
 	});
 
 	// process the login form
@@ -173,5 +261,5 @@ function isLoggedIn(req, res, next) {
 		return next();
 
 	// if they aren't redirect them to the home page
-	res.redirect('/');
+	res.redirect('/unAuthorized');
 }

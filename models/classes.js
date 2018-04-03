@@ -18,6 +18,20 @@ module.exports = function (sequelize, DataTypes) {
                 len: [1]
             }
         },
+        classSchedule: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                len: [1]
+            }
+        },
+        classPrerequisit: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                len: [1]
+            }
+        },
         classPrice: {
             type: DataTypes.INTEGER
         },

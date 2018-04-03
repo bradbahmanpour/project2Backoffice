@@ -18,7 +18,7 @@
           <div class="class-container">
             <div class="row top-30">
               <div>
-                <a class="btn btn-default" href="/classes">Add New Class</a>
+                <a class="btn btn-default" href="/topSpots">Add New Top Diving Spot</a>
               </div>
             </div>
           </div>
@@ -34,7 +34,7 @@
     $(document).ready(function () {
       /* global moment */
       // classContainer holds all of our Classes
-      var classContainer = $(".class-container");
+      var topSpotsContainer = $(".class-container");
       var postCategorySelect = $("#category");
       // Click events for the edit and delete buttons
       $(document).on("click", "button.delete", handlePostDelete);
@@ -43,12 +43,12 @@
       var posts;
 
       // This function grabs posts from the database and updates the view
-      function getClasses() {
+      function getTopSpots() {
 
-        $.get("/api/classes", function (data) {
-          console.log("Classes", data);
-          classes = data;
-          if (!classes || !classes.length) {
+        $.get("/api/topSpots", function (data) {
+          console.log("Top Spots:", data);
+          topSpots = data;
+          if (!topSpots || !topSpots.length) {
             displayEmpty();
           } else {
             initializeRows();
@@ -57,34 +57,34 @@
       }
 
       // This function does an API call to delete posts
-      function deleteClass(id) {
+      function deleteTopSpots(id) {
         $.ajax({
             method: "DELETE",
-            url: "/api/classes/" + id
+            url: "/api/topSpots/" + id
           })
           .then(function () {
-            getClasses();
+            getTopSpots();
           });
       }
 
       // Getting the initial list of posts
-      getClasses();
+      getTopSpots();
       // InitializeRows handles appending all of our constructed post HTML inside
       // blogContainer
       function initializeRows() {
-        classContainer.empty();
-        var classesToAdd = [];
-        for (var i = 0; i < classes.length; i++) {
-          classesToAdd.push(createNewRow(classes[i]));
+        topSpotsContainer.empty();
+        var topSpotsToAdd = [];
+        for (var i = 0; i < topSpots.length; i++) {
+          topSpotsToAdd.push(createNewRow(topSpots[i]));
         }
-        classContainer.append(classesToAdd);
+        topSpotsContainer.append(topSpotsToAdd);
         var messageH2 = $("<h3>");
         messageH2.css({
           "text-align": "center",
           "margin-top": "30px"
         });
-        messageH2.html("<a href='/classes'>Click here</a> to add a new class.");
-        classContainer.append(messageH2);
+        messageH2.html("<a href='/topSpots'>Click here</a> to add a new Top Diving Spot.");
+        topSpotsContainer.append(messageH2);
       }
 
       // This function constructs a post's HTML
@@ -112,8 +112,8 @@
         var newPostPanelBody = $("<div>");
         newPostPanelBody.addClass("panel-body");
         var newPostBody = $("<p>");
-        newPostTitle.text(post.className + " ");
-        newPostBody.text(post.classDescription);
+        newPostTitle.text(post.spot + " ");
+        newPostBody.text(post.body);
         //var formattedDate = new Date(post.createdAt);
         //formattedDate = moment(formattedDate).format("MMMM Do YYYY, h:mm:ss a");
         //newPostDate.text(formattedDate);
@@ -136,7 +136,7 @@
           .parent()
           .parent()
           .data("post");
-        deleteClass(currentPost.id);
+          deleteTopSpots(currentPost.id);
       }
 
       // This function figures out which post we want to edit and takes it to the
@@ -146,7 +146,7 @@
           .parent()
           .parent()
           .data("post");
-        window.location.href = "/classes?post_id=" + currentPost.id;
+        window.location.href = "/topSpots?post_id=" + currentPost.id;
       }
 
       // This function displays a message when there are no posts
@@ -158,7 +158,7 @@
           "margin-top": "50px"
         });
         messageH2.html(
-          "No Classes has been created yet, navigate <a href='/classes'>here</a> in order to create a new class."
+          "No Top Diving Spot has been created yet, navigate <a href='/classes'>here</a> in order to create a new Dive Top Spot."
         );
         classContainer.append(messageH2);
       }

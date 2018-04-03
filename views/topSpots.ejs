@@ -26,24 +26,19 @@
 				<div class="col-sm-8 text-left">
 
 					<div class="col-md-6 col-md-offset-3">
-						<form id="classForm">
+						<form id="topSpotsForm">
 							<div class="form-group">
-								<label for="classname">Class Name:</label>
-								<input type="text" class="form-control" id="classname">
+								<label for="spot">Top Spot Name:</label>
+								<input type="text" class="form-control" id="spot">
 								<br />
-								<label for="classdesc">Description:</label>
-								<textarea class="form-control" rows="10" id="classdesc"></textarea>
+								<label for="images">Images URL,[Comma Delimited]:</label>
+								<textarea class="form-control" rows="6" id="images"></textarea>
 								<br />
+								<label for="body">Description:</label>
+								<textarea class="form-control" rows="10" id="body"></textarea>
 								<br />
-								<label for="classSchedule">Schedule:</label>
-								<textarea class="form-control" rows="5" id="classSchedule"></textarea>
-								<br />
-								<br />
-								<label for="classPrerequisit">Prerequisit:</label>
-								<textarea class="form-control" rows="5" id="classPrerequisit"></textarea>
-								<br />
-								<label for="classprice">Price:</label>
-								<input type="number" class="form-control" id="classprice">
+								<label for="zip">Zip <Code></Code>:</label>
+								<input type="number" class="form-control" id="zip">
 								<br />
 								<button type="submit" class="btn btn-success submit">Submit</button>
 							</div>
@@ -80,66 +75,62 @@
 
 
 				// Getting jQuery references to the post body, title, form, and category select
-				var titleInput = $("#classname");
-				var classInput = $("#classdesc");
-				var scheduleInput = $("#classSchedule");
-				var prerequisitInput = $("#classPrerequisit");
-				var priceInput = $("#classprice");
-				var classForm = $("#classForm");
+				var spotInput = $("#spot");
+				var imagesInput = $("#images");
+				var bodyInput = $("#body");
+				var zipInput = $("#zip");
+				var topSpotsForm = $("#topSpotsForm");
 
 				// Adding an event listener for when the form is submitted
-				$(classForm).on("submit", function handleFormSubmit(event) {
+				$(topSpotsForm).on("submit", function handleFormSubmit(event) {
 					event.preventDefault();
 
-					console.log(titleInput);
-					console.log(classInput);
-					console.log(priceInput);
-					console.log(scheduleInput);
-					console.log(prerequisitInput);
+					console.log(spotInput);
+					console.log(imagesInput);
+					console.log(bodyInput);
+					console.log(zipInput);
 
 
 					// Wont submit the post if we are missing a body or a title
-					if (!titleInput.val().trim() || !classInput.val().trim()) {
+					if (!spotInput.val().trim() || !bodyInput.val().trim()) {
 						return;
 					}
 					// Constructing a newPost object to hand to the database
-					var newClass = {
-						className: titleInput.val().trim(),
-						classDescription: classInput.val().trim(),
-						classSchedule: scheduleInput.val().trim(),
-						classPrerequisit: prerequisitInput.val().trim(),
-						classPrice: priceInput.val()
+					var newTopSpot = {
+						spot: spotInput.val().trim(),
+						images: imagesInput.val().trim(),
+						body: bodyInput.val().trim(),
+						zip: zipInput.val()
 					};
 
-					console.log(newClass);
+					console.log(newTopSpot);
 
 					// If we're updating a post run updatePost to update a post
 					// Otherwise run submitPost to create a whole new post
 					if (updating) {
-						newClass.id = postId;
-						updateClass(newClass);
+						newTopSpot.id = postId;
+						updateClass(newTopSpot);
 					} else {
-						submitClass(newClass);
+						submitClass(newTopSpot);
 					}
 				});
 
-				// Submits a new post and brings user to blog page upon completion
+				// Submits a new post and brings user to Admin page upon completion
 				function submitClass(Class) {
-					$.post("/api/classes/", Class, function () {
-						window.location.href = "/addClass";
+					$.post("/api/topSpots/", Class, function () {
+						window.location.href = "/addTopSpot";
 					});
 				}
 
 				// Gets post data for a post if we're editing
 				function getClassData(id) {
-					$.get("/api/classes/" + id, function (data) {
+					$.get("/api/topSpots/" + id, function (data) {
 						if (data) {
 							// If this post exists, prefill our cms forms with its data 
-							titleInput.val(data.className);
-							classInput.val(data.classDescription);
-							priceInput.val(data.classPrice);
-							scheduleInput.val(data.classSchedule);
-						    prerequisitInput.val(data.classPrerequisit);
+						    spotInput.val(data.spot);
+							imagesInput.val(data.images);
+							bodyInput.val(data.body);
+							zipInput.val(data.zip);
 							// If we have a post with this id, set a flag for us to know to update the post
 							// when we hit submit
 							updating = true;
@@ -151,11 +142,11 @@
 				function updateClass(Class) {
 					$.ajax({
 							method: "PUT",
-							url: "/api/classes",
+							url: "/api/topSpots",
 							data: Class
 						})
 						.then(function () {
-							window.location.href = "/addClass";
+							window.location.href = "/addTopSpot";
 						});
 				}
 			});
